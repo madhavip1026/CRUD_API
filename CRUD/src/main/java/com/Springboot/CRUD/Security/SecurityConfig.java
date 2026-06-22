@@ -14,6 +14,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.Customizer;
+
 import java.util.Arrays;
 
 @Configuration
@@ -22,6 +24,9 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
+    @Autowired
+    private OAuth2SuccessHandler oauth2SuccessHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http)
@@ -29,19 +34,19 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(
-                        session ->
-                                session.sessionCreationPolicy(
-                                        SessionCreationPolicy.STATELESS))
+                //.sessionManagement(
+                  //      session ->
+                    //            session.sessionCreationPolicy(
+                      //                  SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/login")
-                                .permitAll()
-                                .requestMatchers("/login", "/employees")
+                                .requestMatchers("/","/login", "/employees","/oauth2/**","/login/oauth2/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )
+                .oauth2Login(oauth ->
+            oauth.successHandler(oauth2SuccessHandler))
                 .addFilterBefore(
                         jwtFilter,
                         UsernamePasswordAuthenticationFilter.class);
