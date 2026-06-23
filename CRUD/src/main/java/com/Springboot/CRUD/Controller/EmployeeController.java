@@ -3,6 +3,9 @@ package com.Springboot.CRUD.Controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,14 +25,17 @@ public class EmployeeController {
    EmployeeService service;
 
    @GetMapping
+   @PreAuthorize("hasRole('ADMIN')")
    public List<Employee> getEmployees() {
       return service.getAllEmployees();
    }
+   @PreAuthorize("hasRole('ADMIN') or @employeeService.isOwnAccount(#id)")
    @GetMapping("/{id}")
     public Employee getEmployee(@PathVariable Long id) {
 
         return service.getEmployee(id);
     }
+   @PreAuthorize("hasRole('ADMIN')")
    @PostMapping
 public Employee createEmployee(@RequestBody Employee employee) {
     try {
@@ -46,6 +52,7 @@ public Employee createEmployee(@RequestBody Employee employee) {
 
     //return service.createEmployee(employee);
    //}
+   @PreAuthorize("hasRole('ADMIN') or @employeeService.isOwnAccount(#id)")
    @PutMapping("/{id}")
 public Employee updateEmployee(
         @PathVariable Long id,
@@ -53,6 +60,7 @@ public Employee updateEmployee(
 
     return service.updateEmployee(id, employee);
 }
+@PreAuthorize("hasRole('ADMIN')")
 @DeleteMapping("/{id}")
 public String deleteEmployee(
         @PathVariable Long id) {

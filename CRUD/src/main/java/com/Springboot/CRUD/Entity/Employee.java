@@ -31,11 +31,18 @@ public class Employee {
     private String name;
     private String email;
     private String department;
+    private String role;   
     
     // No-arg constructor for JPA and Jackson
     //public Employee() {
    //}
     
+    public String getRole() {
+        return role;
+    }
+    public void setRole(String role) {
+        this.role = role;
+    }
     //public Employee(Long id, Map<String, Object> additionalInfo, String name, String email, String department) {
       //  this.id = id;
         //this.additionalInfo = additionalInfo;

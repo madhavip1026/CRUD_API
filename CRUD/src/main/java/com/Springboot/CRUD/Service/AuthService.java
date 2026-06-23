@@ -28,7 +28,7 @@ public class AuthService {
     System.out.println("Employee Found");
 
     String token =
-            jwtService.generateToken(employee.getEmail());
+            jwtService.generateToken(employee.getEmail(), employee.getRole());
 
     System.out.println("Generated Token = " + token);
 

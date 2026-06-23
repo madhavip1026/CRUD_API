@@ -1,9 +1,12 @@
 package com.Springboot.CRUD.Security;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -43,6 +46,12 @@ public class JwtFilter extends OncePerRequestFilter {
             System.out.println("Token: " + token);
 
             if(jwtService.validateToken(token)) {
+                String email = jwtService.extractEmail(token);
+                String role = jwtService.extractRole(token);
+                List<GrantedAuthority> authorities =
+                List.of(new SimpleGrantedAuthority("ROLE_" + role));
+                System.out.println("Email: " + email);
+                System.out.println("Role: " + role);
 
                 System.out.println(
                         "JWT Token Valid");
@@ -50,8 +59,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 // Set authentication context with proper authorities
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
-                                "user", null, java.util.Arrays.asList(
-                                        new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER")));
+                                email, null, authorities);
+                System.out.println("Authorities: " + authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 System.out.println("Authentication set in SecurityContext");
             } else {

@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import com.Springboot.CRUD.Entity.Employee;
+import com.Springboot.CRUD.Repository.EmployeeRepository;
 import com.Springboot.CRUD.Service.JWTService;
 
 import java.io.IOException;
@@ -21,6 +23,9 @@ public class OAuth2SuccessHandler
     @Autowired
     private JWTService jwtService;
 
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
@@ -31,11 +36,17 @@ public class OAuth2SuccessHandler
         OAuth2User user =
                 (OAuth2User) authentication.getPrincipal();
 
-        String username =
-                user.getAttribute("login");
+        String email =
+                user.getAttribute("email");
+
+        Employee employee =
+                employeeRepository.findByEmail(email)
+                        .orElse(null);
+
+        String role = (employee != null) ? employee.getRole() : "USER";
 
         String jwt =
-                jwtService.generateToken(username);
+                jwtService.generateToken(email, role);
 
         response.getWriter().write(jwt);
     }

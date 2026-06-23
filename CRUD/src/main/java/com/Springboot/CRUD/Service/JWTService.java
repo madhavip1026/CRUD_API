@@ -13,10 +13,11 @@ public class JWTService {
     private static final String SECRET =
             "mysecretkeymysecretkeymysecretkey123456";
 
-    public String generateToken(String email) {
+    public String generateToken(String email, String role) {
 
         return Jwts.builder()
                 .subject(email)
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(
                         new Date(
@@ -33,6 +34,20 @@ public class JWTService {
                 )
                 .compact();
     }
+    public String extractRole(String token) {
+    return Jwts.parser()
+            .verifyWith(
+                    Keys.hmacShaKeyFor(
+                            SECRET.getBytes(
+                                    StandardCharsets.UTF_8
+                            )
+                    )
+            )
+            .build()
+            .parseSignedClaims(token)
+            .getPayload()
+            .get("role", String.class);
+}
 
     public String extractEmail(String token) {
 

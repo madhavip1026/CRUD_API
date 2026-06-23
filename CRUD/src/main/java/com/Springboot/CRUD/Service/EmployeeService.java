@@ -3,6 +3,8 @@ package com.Springboot.CRUD.Service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
@@ -61,6 +63,10 @@ public class EmployeeService {
     employee.setEmail(request.getEmail());
     employee.setDepartment(request.getDepartment());
     employee.setAdditionalInfo(request.getAdditionalInfo());
+    
+    if (request.getRole() != null) {
+        employee.setRole(request.getRole());
+    }
 
     Employee updatedEmployee =
             repository.save(employee);
@@ -82,5 +88,25 @@ public class EmployeeService {
 
     cacheService.delete(id);
 }
+
+   // Check if current user owns this account
+   public boolean isOwnAccount(Long employeeId) {
+       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+       
+       if (authentication == null || !authentication.isAuthenticated()) {
+           return false;
+       }
+       
+       String currentUserEmail = authentication.getName();
+       
+       Employee employee = repository.findById(employeeId)
+               .orElse(null);
+       
+       if (employee == null) {
+           return false;
+       }
+       
+       return employee.getEmail().equals(currentUserEmail);
+   }
 
 }
