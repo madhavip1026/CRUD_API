@@ -16,23 +16,32 @@ public class AuthService {
     private JWTService jwtService;
 
     
-    public String login(LoginRequest request) {
+    public String login(String email,
+        String password) {
 
     System.out.println("Inside AuthService");
 
     Employee employee =
-            repository.findByEmail(request.getEmail())
+            repository.findByEmail(email)
             .orElseThrow(() ->
                     new RuntimeException("User Not Found"));
+        System.out.println("Employee Found");
+    if (!employee.getPassword()
+            .equals(password)) {
 
-    System.out.println("Employee Found");
+        throw new RuntimeException("Invalid Password");
+    }
 
-    String token =
-            jwtService.generateToken(employee.getEmail(), employee.getRole());
+    return jwtService.generateToken(
+            employee.getEmail(),
+            employee.getRole());
 
-    System.out.println("Generated Token = " + token);
+    //String token =
+           // jwtService.generateToken(employee.getEmail(), employee.getRole());
 
-    return token;
+    //System.out.println("Generated Token = " + token);
+
+    //return token;
 }
 }
 

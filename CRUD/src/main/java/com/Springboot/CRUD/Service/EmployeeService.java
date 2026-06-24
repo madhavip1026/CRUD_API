@@ -63,6 +63,7 @@ public class EmployeeService {
     employee.setEmail(request.getEmail());
     employee.setDepartment(request.getDepartment());
     employee.setAdditionalInfo(request.getAdditionalInfo());
+    employee.setPassword(request.getPassword());
     
     if (request.getRole() != null) {
         employee.setRole(request.getRole());
