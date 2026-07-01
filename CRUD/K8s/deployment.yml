@@ -23,7 +23,7 @@ spec:
 
       - name: employee-api
 
-        image: us-central1-docker.pkg.dev/PROJECT_ID/springboot-repo/employee-api:latest
+        image: us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:latest
 
         ports:
 
