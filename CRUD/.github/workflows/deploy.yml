@@ -35,6 +35,7 @@ jobs:
 
     - name: Build Spring Boot App
       run: |
+        cd CRUD
         mvn clean package -DskipTests
 
 
@@ -45,6 +46,7 @@ jobs:
 
     - name: Build Docker Image
       run: |
+        cd CRUD
         docker build \
         -t us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:${{ github.sha }} .
 
@@ -65,4 +67,3 @@ jobs:
     - name: Deploy to GKE
       run: |
         kubectl apply -f K8s/
-        
