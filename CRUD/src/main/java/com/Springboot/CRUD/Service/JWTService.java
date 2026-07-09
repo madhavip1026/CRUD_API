@@ -2,6 +2,7 @@ package com.Springboot.CRUD.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Jwts;
@@ -10,8 +11,11 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JWTService {
 
-    private static final String SECRET =
-            "mysecretkeymysecretkeymysecretkey123456";
+    private final String secret;
+
+    public JWTService(@Value("${jwt.secret}") String secret) {
+        this.secret = secret;
+    }
 
     public String generateToken(String email, String role) {
 
@@ -27,7 +31,7 @@ public class JWTService {
                 )
                 .signWith(
                         Keys.hmacShaKeyFor(
-                                SECRET.getBytes(
+                                secret.getBytes(
                                         StandardCharsets.UTF_8
                                 )
                         )
@@ -38,7 +42,7 @@ public class JWTService {
     return Jwts.parser()
             .verifyWith(
                     Keys.hmacShaKeyFor(
-                            SECRET.getBytes(
+                            secret.getBytes(
                                     StandardCharsets.UTF_8
                             )
                     )
@@ -54,7 +58,7 @@ public class JWTService {
         return Jwts.parser()
                 .verifyWith(
                         Keys.hmacShaKeyFor(
-                                SECRET.getBytes(
+                                secret.getBytes(
                                         StandardCharsets.UTF_8
                                 )
                         )
@@ -72,7 +76,7 @@ public class JWTService {
             Jwts.parser()
                     .verifyWith(
                             Keys.hmacShaKeyFor(
-                                    SECRET.getBytes(
+                                    secret.getBytes(
                                             StandardCharsets.UTF_8
                                     )
                             )

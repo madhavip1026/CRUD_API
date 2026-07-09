@@ -4,18 +4,27 @@ kind: Deployment
 metadata:
   name: employee-api
 
+
 spec:
-  replicas: 2
+
+  replicas: 3
+
 
   selector:
+
     matchLabels:
+
       app: employee-api
+
 
   template:
 
     metadata:
+
       labels:
+
         app: employee-api
+
 
     spec:
 
@@ -23,8 +32,95 @@ spec:
 
       - name: employee-api
 
-        image: us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:v1
+        image: us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:latest
+
 
         ports:
 
         - containerPort: 8080
+
+
+        env:
+
+
+        - name: DB_URL
+
+          valueFrom:
+
+            secretKeyRef:
+
+              name: employee-api-secrets
+
+              key: DB_URL
+
+
+
+        - name: DB_USERNAME
+
+          valueFrom:
+
+            secretKeyRef:
+
+              name: employee-api-secrets
+
+              key: DB_USERNAME
+
+
+
+        - name: DB_PASSWORD
+
+          valueFrom:
+
+            secretKeyRef:
+
+              name: employee-api-secrets
+
+              key: DB_PASSWORD
+
+
+
+        - name: OAUTH_CLIENT_ID
+
+          valueFrom:
+
+            secretKeyRef:
+
+              name: employee-api-secrets
+
+              key: OAUTH_CLIENT_ID
+
+
+
+        - name: OAUTH_CLIENT_SECRET
+
+          valueFrom:
+
+            secretKeyRef:
+
+              name: employee-api-secrets
+
+              key: OAUTH_CLIENT_SECRET
+
+
+
+        - name: JWT_SECRET
+
+          valueFrom:
+
+            secretKeyRef:
+
+              name: employee-api-secrets
+
+              key: JWT_SECRET
+
+
+
+        - name: JWT_EXPIRATION
+
+          valueFrom:
+
+            secretKeyRef:
+
+              name: employee-api-secrets
+
+              key: JWT_EXPIRATION
