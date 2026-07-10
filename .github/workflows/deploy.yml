@@ -31,6 +31,7 @@ jobs:
 
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v3
+
       - name: Install GKE auth plugin
         run: |
           gcloud components install gke-gcloud-auth-plugin --quiet
@@ -39,16 +40,33 @@ jobs:
         run: |
           echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
 
+      - name: Resolve project directory
+        id: project-dir
+        shell: bash
+        run: |
+          if [ -f pom.xml ]; then
+            PROJECT_DIR="$GITHUB_WORKSPACE"
+          elif [ -f CRUD/pom.xml ]; then
+            PROJECT_DIR="$GITHUB_WORKSPACE/CRUD"
+          else
+            echo "Could not find pom.xml in the repository root or under CRUD/"
+            exit 1
+          fi
+          echo "project_dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
+
       - name: Build Spring Boot App
-        working-directory: CRUD
-        run: mvn clean package -DskipTests
+        shell: bash
+        run: |
+          cd "${{ steps.project-dir.outputs.project_dir }}"
+          ./mvnw clean package -DskipTests
 
       - name: Configure Docker Authentication
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Build Docker Image
-        working-directory: CRUD
+        shell: bash
         run: |
+          cd "${{ steps.project-dir.outputs.project_dir }}"
           docker build -t us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:${{ github.sha }} .
 
       - name: Push Docker Image
@@ -62,7 +80,9 @@ jobs:
             --project employee-rbac
 
       - name: Deploy to GKE
-        working-directory: CRUD
-        run: kubectl apply -f K8s/
-        kubectl set image deployment/employee-api \
-        employee-api=us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:${{ github.sha }}
+        shell: bash
+        run: |
+          cd "${{ steps.project-dir.outputs.project_dir }}"
+          kubectl apply -f K8s/
+          kubectl set image deployment/employee-api \
+            employee-api=us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:${{ github.sha }}
