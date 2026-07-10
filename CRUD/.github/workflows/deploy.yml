@@ -9,61 +9,45 @@ permissions:
   contents: read
   id-token: write
 
-
 jobs:
-
   deploy:
-
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v5
 
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/515371922948/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: github-actions@employee-rbac.iam.gserviceaccount.com
 
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
 
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v2
-      with:
-        workload_identity_provider: projects/515371922948/locations/global/workloadIdentityPools/github-pool/providers/github-provider
-        service_account: github-actions@employee-rbac.iam.gserviceaccount.com
+      - name: Build Spring Boot App
+        working-directory: CRUD
+        run: mvn clean package -DskipTests
 
+      - name: Configure Docker Authentication
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
-    - name: Setup Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v2
+      - name: Build Docker Image
+        working-directory: CRUD
+        run: |
+          docker build -t us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:${{ github.sha }} .
 
+      - name: Push Docker Image
+        run: |
+          docker push us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:${{ github.sha }}
 
-    - name: Build Spring Boot App
-      run: |
-        cd CRUD
-        mvn clean package -DskipTests
+      - name: Get GKE Credentials
+        run: |
+          gcloud container clusters get-credentials employee-cluster \
+            --zone us-central1-a \
+            --project employee-rbac
 
-
-    - name: Configure Docker Authentication
-      run: |
-        gcloud auth configure-docker us-central1-docker.pkg.dev
-
-
-    - name: Build Docker Image
-      run: |
-        cd CRUD
-        docker build \
-        -t us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:${{ github.sha }} .
-
-
-    - name: Push Docker Image
-      run: |
-        docker push \
-        us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:${{ github.sha }}
-
-
-    - name: Get GKE Credentials
-      run: |
-        gcloud container clusters get-credentials employee-cluster \
-        --zone us-central1-a \
-        --project employee-rbac
-
-
-    - name: Deploy to GKE
-      run: |
-        kubectl apply -f K8s/
+      - name: Deploy to GKE
+        working-directory: CRUD
+        run: kubectl apply -f K8s/
