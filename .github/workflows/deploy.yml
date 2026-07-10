@@ -64,3 +64,5 @@ jobs:
       - name: Deploy to GKE
         working-directory: CRUD
         run: kubectl apply -f K8s/
+        kubectl set image deployment/employee-api \
+        employee-api=us-central1-docker.pkg.dev/employee-rbac/springboot-repo/employee-api:${{ github.sha }}
