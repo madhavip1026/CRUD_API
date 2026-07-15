@@ -15,7 +15,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public String login(@RequestHeader("Email") String email, @RequestHeader("Password") String password) {
         System.out.println("Email Header = " + email);
         System.out.println("Password Header = " + password);

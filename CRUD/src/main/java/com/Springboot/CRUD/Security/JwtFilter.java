@@ -30,6 +30,10 @@ public class JwtFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain)
             throws ServletException, IOException {
+    if(request.getRequestURI().equals("/auth/login")) {
+        filterChain.doFilter(request,response);
+        return;
+    }
 
         String header =
                 request.getHeader("Authorization");
