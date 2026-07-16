@@ -30,52 +30,76 @@ public class JwtFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain)
             throws ServletException, IOException {
-    if(request.getRequestURI().equals("/auth/login")) {
-        filterChain.doFilter(request,response);
-        return;
-    }
 
-        String header =
-                request.getHeader("Authorization");
+
+        // Skip JWT validation for login
+        if(request.getRequestURI().contains("/login")) {
+            filterChain.doFilter(request,response);
+            return;
+        }
+
+
+        String header = request.getHeader("Authorization");
 
         System.out.println("Authorization Header: " + header);
         System.out.println("Request URI: " + request.getRequestURI());
 
-        if(header != null &&
-           header.startsWith("Bearer ")) {
 
-            String token =
-                    header.substring(7);
-            
+        if(header != null && header.startsWith("Bearer ")) {
+
+
+            String token = header.substring(7);
+
             System.out.println("Token: " + token);
 
+
             if(jwtService.validateToken(token)) {
+
+
                 String email = jwtService.extractEmail(token);
                 String role = jwtService.extractRole(token);
-                List<GrantedAuthority> authorities =
-                List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+
                 System.out.println("Email: " + email);
                 System.out.println("Role: " + role);
 
-                System.out.println(
-                        "JWT Token Valid");
-                
-                // Set authentication context with proper authorities
+
+                List<GrantedAuthority> authorities =
+                        List.of(
+                            new SimpleGrantedAuthority("ROLE_" + role)
+                        );
+
+
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
-                                email, null, authorities);
-                System.out.println("Authorities: " + authorities);
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                                email,
+                                null,
+                                authorities
+                        );
+
+
+                SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(auth);
+
+
                 System.out.println("Authentication set in SecurityContext");
+
+
             } else {
+
                 System.out.println("JWT Token Invalid");
+
             }
+
+
         } else {
+
             System.out.println("No Bearer token found");
+
         }
 
-        filterChain.doFilter(
-                request,
-                response);
+
+        filterChain.doFilter(request,response);
     }
 }
