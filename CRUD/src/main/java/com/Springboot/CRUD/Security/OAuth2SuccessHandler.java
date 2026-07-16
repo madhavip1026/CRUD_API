@@ -49,5 +49,6 @@ public class OAuth2SuccessHandler
                 jwtService.generateToken(email, role);
 
         response.getWriter().write(jwt);
+        System.out.println(user.getAttributes());
     }
 }
