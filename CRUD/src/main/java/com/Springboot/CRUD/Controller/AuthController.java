@@ -1,4 +1,4 @@
-package com.Springboot.CRUD.Controller;
+/*package com.Springboot.CRUD.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,16 +16,18 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/auth/login")
-    public String login(@RequestHeader("Email") String email, @RequestHeader("Password") String password) {
-        System.out.println("Email Header = " + email);
-        System.out.println("Password Header = " + password);
+public String login(
+        @RequestBody LoginRequest request) {
+            System.out.println("LOGIN API HIT");
 
-        System.out.println("LOGIN API HIT");
-    
-
-    return authService.login(email, password);
-    }
-    
+    return authService.login(
+        request.getEmail(),
+        request.getPassword()
+    );
 }
+
+    
+    
+}*/
 
 
