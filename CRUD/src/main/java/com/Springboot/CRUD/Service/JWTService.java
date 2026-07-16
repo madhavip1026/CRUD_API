@@ -20,7 +20,7 @@ public class JWTService {
     public String generateToken(String email, String role) {
 
         return Jwts.builder()
-                .subject(email)
+                .claim("email", email)
                 .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(
