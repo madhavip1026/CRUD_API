@@ -25,12 +25,9 @@ public class AuthService {
                 .findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!passwordEncoder.matches(
-                password,
-                employee.getPassword())) {
-
-            throw new RuntimeException("Invalid credentials");
-        }
+        if(!password.equals(employee.getPassword())) {
+    throw new RuntimeException("Invalid credentials");
+}
 
         return jwtService.generateToken(
                 employee.getEmail(),
