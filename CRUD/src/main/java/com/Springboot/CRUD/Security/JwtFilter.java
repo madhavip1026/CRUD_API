@@ -51,6 +51,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
             String email = jwtService.extractEmail(token);
             String role = jwtService.extractRole(token);
+            System.out.println("JWT EMAIL: " + email);
+            System.out.println("JWT ROLE: " + role);
 
             List<GrantedAuthority> authorities =
                     List.of(new SimpleGrantedAuthority("ROLE_" + role));
@@ -63,7 +65,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext()
                     .setAuthentication(authentication);
-        }
+        }else {
+    System.out.println("JWT VALIDATION FAILED");
+}
 
         filterChain.doFilter(request, response);
     }
