@@ -66,7 +66,7 @@ public class JWTService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .getSubject();
+                .get("email", String.class);
     }
 
     public boolean validateToken(String token) {
