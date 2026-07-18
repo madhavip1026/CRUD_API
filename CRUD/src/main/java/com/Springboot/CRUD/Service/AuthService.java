@@ -1,8 +1,9 @@
-/*package com.Springboot.CRUD.Service;
+package com.Springboot.CRUD.Service;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.Springboot.CRUD.DTO.LoginRequest;
 import com.Springboot.CRUD.Entity.Employee;
 import com.Springboot.CRUD.Repository.EmployeeRepository;
 
@@ -15,33 +16,26 @@ public class AuthService {
     @Autowired
     private JWTService jwtService;
 
-    
-    public String login(String email,
-        String password) {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    System.out.println("Inside AuthService");
+    public String login(String email, String password) {
 
-    Employee employee =
-            repository.findByEmail(email)
-            .orElseThrow(() ->
-                    new RuntimeException("User Not Found"));
-        System.out.println("Employee Found");
-    if (!employee.getPassword()
-            .equals(password)) {
+        Employee employee = repository
+                .findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        throw new RuntimeException("Invalid Password");
+        if (!passwordEncoder.matches(
+                password,
+                employee.getPassword())) {
+
+            throw new RuntimeException("Invalid credentials");
+        }
+
+        return jwtService.generateToken(
+                employee.getEmail(),
+                employee.getRole());
     }
 
-    return jwtService.generateToken(
-            employee.getEmail(),
-            employee.getRole());
-
-    //String token =
-           // jwtService.generateToken(employee.getEmail(), employee.getRole());
-
-    //System.out.println("Generated Token = " + token);
-
-    //return token;
 }
-}*/
 

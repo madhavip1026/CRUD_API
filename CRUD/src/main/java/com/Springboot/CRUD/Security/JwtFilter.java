@@ -17,7 +17,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -31,75 +30,41 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getServletPath();
 
         // Skip JWT validation for login
-        if(request.getRequestURI().contains("/login")) {
-            filterChain.doFilter(request,response);
+        if (path.equals("/auth/login")) {
+            filterChain.doFilter(request, response);
             return;
         }
 
+        String authHeader = request.getHeader("Authorization");
 
-        String header = request.getHeader("Authorization");
-
-        System.out.println("Authorization Header: " + header);
-        System.out.println("Request URI: " + request.getRequestURI());
-
-
-        if(header != null && header.startsWith("Bearer ")) {
-
-
-            String token = header.substring(7);
-
-            System.out.println("Token: " + token);
-
-
-            if(jwtService.validateToken(token)) {
-
-
-                String email = jwtService.extractEmail(token);
-                String role = jwtService.extractRole(token);
-
-
-                System.out.println("Email: " + email);
-                System.out.println("Role: " + role);
-
-
-                List<GrantedAuthority> authorities =
-                        List.of(
-                            new SimpleGrantedAuthority("ROLE_" + role)
-                        );
-
-
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                email,
-                                null,
-                                authorities
-                        );
-
-
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(auth);
-
-
-                System.out.println("Authentication set in SecurityContext");
-
-
-            } else {
-
-                System.out.println("JWT Token Invalid");
-
-            }
-
-
-        } else {
-
-            System.out.println("No Bearer token found");
-
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
+        String token = authHeader.substring(7);
 
-        filterChain.doFilter(request,response);
+        if (jwtService.validateToken(token)) {
+
+            String email = jwtService.extractEmail(token);
+            String role = jwtService.extractRole(token);
+
+            List<GrantedAuthority> authorities =
+                    List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            null,
+                            authorities);
+
+            SecurityContextHolder.getContext()
+                    .setAuthentication(authentication);
+        }
+
+        filterChain.doFilter(request, response);
     }
 }

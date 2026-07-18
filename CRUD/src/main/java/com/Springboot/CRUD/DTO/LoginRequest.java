@@ -1,4 +1,4 @@
-/*package com.Springboot.CRUD.DTO;
+package com.Springboot.CRUD.DTO;
 
 public class LoginRequest {
     private String email;
@@ -23,4 +23,4 @@ public class LoginRequest {
         this.email = email;
     }
 
-}*/
+}

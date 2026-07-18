@@ -1,4 +1,4 @@
-package com.Springboot.CRUD.Security;
+/*package com.Springboot.CRUD.Security;
 
 
 import jakarta.servlet.ServletException;
@@ -52,3 +52,4 @@ public class OAuth2SuccessHandler
         System.out.println(user.getAttributes());
     }
 }
+*/
