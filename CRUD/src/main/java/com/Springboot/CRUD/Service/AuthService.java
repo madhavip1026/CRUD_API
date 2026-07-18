@@ -16,8 +16,8 @@ public class AuthService {
     @Autowired
     private JWTService jwtService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    //@Autowired
+    //private PasswordEncoder passwordEncoder;
 
     public String login(String email, String password) {
 
